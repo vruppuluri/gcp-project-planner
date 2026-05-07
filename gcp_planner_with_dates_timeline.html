@@ -1,0 +1,480 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',-apple-system,sans-serif}
+.app{background:#f8fafc;min-height:600px}
+header{background:#fff;border-bottom:1px solid #e5e7eb;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,#4285F4,#0F9D58);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{font-weight:700;font-size:14px;letter-spacing:-.3px}
+.logo-sub{font-size:10px;color:#9ca3af}
+.add-btn{padding:6px 14px;background:#2563eb;color:#fff;border:none;border-radius:7px;font-weight:600;font-size:12px;cursor:pointer}
+.main{padding:16px 20px;max-width:1200px;margin:0 auto}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.metric{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px}
+.metric-label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;font-weight:500}
+.metric-val{font-size:22px;font-weight:700}
+.pbar{height:3px;background:#f3f4f6;border-radius:2px;margin-top:5px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:2px;transition:width .5s}
+.tabs{display:flex;gap:0;border-bottom:1px solid #e5e7eb;margin-bottom:16px}
+.tab{padding:9px 16px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:400;color:#6b7280;border-bottom:2px solid transparent;display:flex;align-items:center;gap:5px}
+.tab.on{font-weight:600;color:#2563eb;border-bottom-color:#2563eb}
+.panel{display:none}
+.panel.on{display:block}
+.filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filt{padding:4px 12px;border-radius:20px;border:1px solid #e5e7eb;background:transparent;color:#6b7280;font-size:11px;cursor:pointer}
+.filt.on{background:#eff6ff;color:#1d4ed8;border-color:#2563eb;font-weight:600}
+.col-hd{display:grid;grid-template-columns:28px 1fr 105px 115px 70px 90px 100px 70px;gap:8px;padding:8px 14px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px 8px 0 0;font-size:10px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.task-row{display:grid;grid-template-columns:28px 1fr 105px 115px 70px 90px 100px 70px;gap:8px;padding:10px 14px;border:1px solid #f3f4f6;border-top:none;background:#fff;align-items:center;font-size:12px}
+.task-row:hover{background:#fafafa}
+.task-row:last-child{border-radius:0 0 8px 8px}
+.done-name{text-decoration:line-through;color:#9ca3af}
+.badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
+.badge-infra{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.badge-iam{background:#f5f3ff;color:#5b21b6;border:1px solid #ddd6fe}
+.badge-net{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+.badge-sec{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.badge-ci{background:#f0fdf4;color:#14532d;border:1px solid #bbf7d0}
+.badge-mon{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.prio-high{background:#fef2f2;color:#991b1b}
+.prio-med{background:#fffbeb;color:#92400e}
+.prio-low{background:#f0fdf4;color:#14532d}
+.st-done{background:#ecfdf5;color:#065f46}
+.st-prog{background:#eff6ff;color:#1d4ed8}
+.st-todo{background:#f3f4f6;color:#374151}
+.st-block{background:#fef2f2;color:#991b1b}
+.avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.date-cell{line-height:1.5}
+.date-end-late{color:#dc2626}
+/* Gantt */
+.gantt-wrap{overflow-x:auto}
+.sprint-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.sprint-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px}
+.sprint-id{font-size:11px;font-weight:700;color:#2563eb;margin-bottom:2px}
+.sprint-dates{font-size:10px;color:#9ca3af;margin-bottom:6px}
+.sprint-goal{font-size:11px;color:#374151;margin-bottom:8px;line-height:1.4}
+.sprint-prog{height:4px;background:#f3f4f6;border-radius:2px;overflow:hidden}
+.sprint-prog-fill{height:100%;background:#059669;border-radius:2px}
+.sprint-stat{font-size:10px;color:#9ca3af;margin-top:4px}
+.gantt-box{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;min-width:800px}
+.gantt-legend{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.gantt-legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:#6b7280}
+.gantt-legend-dot{width:14px;height:7px;border-radius:2px}
+/* Resources */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.res-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:500px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-head{padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:16px 20px 20px}
+.field{margin-bottom:10px}
+.field label{font-size:11px;color:#6b7280;font-weight:500;display:block;margin-bottom:3px}
+.field input,.field select,.field textarea{width:100%;padding:7px 9px;border:1px solid #e5e7eb;border-radius:7px;font-size:12px;font-family:inherit;outline:none}
+.field input:focus,.field select:focus{border-color:#2563eb}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mode-tabs{display:flex;gap:6px;margin-bottom:14px}
+.mode-tab{flex:1;padding:7px;border-radius:7px;border:1.5px solid #e5e7eb;background:transparent;color:#6b7280;font-weight:500;font-size:12px;cursor:pointer;text-align:center}
+.mode-tab.on{border-color:#2563eb;background:#eff6ff;color:#1d4ed8}
+.submit-btn{width:100%;padding:9px;border:none;border-radius:7px;font-weight:600;font-size:13px;cursor:pointer;margin-top:6px}
+.ai-tag{font-size:10px;padding:2px 7px;border-radius:10px;background:#f5f3ff;color:#5b21b6;margin-left:6px}
+.ai-card{padding:9px 10px;border:1px solid #e5e7eb;border-radius:7px;margin-bottom:7px;background:#fafafa}
+.ai-card-name{font-size:12px;font-weight:500;margin-bottom:5px}
+.ai-card-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tf-block{background:#1e1e2e;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.tf-head{padding:9px 14px;background:#2a2a3e;display:flex;justify-content:space-between;align-items:center}
+.tf-title{font-size:12px;font-weight:600;color:#e2e8f0}
+.tf-file{font-size:10px;color:#64748b;font-family:monospace}
+pre{margin:0;padding:14px;font-size:11px;line-height:1.7;color:#a9b1d6;font-family:'JetBrains Mono','Fira Code',monospace;overflow-x:auto}
+.gh-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gh-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px}
+.gh-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.gh-card-title{font-size:13px;font-weight:600}
+.gh-list{list-style:none;padding:0}
+.gh-list li{font-size:11px;color:#6b7280;padding:3px 0;border-bottom:1px solid #f9fafb;display:flex;gap:6px}
+.sh-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e5e7eb}
+.sh-table th{padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;background:#f9fafb;border-bottom:1px solid #e5e7eb}
+.sh-table td{padding:11px 14px;border-bottom:1px solid #f3f4f6;vertical-align:top}
+.sh-table tr:hover td{background:#fafafa}
+</style>
+
+<div class="app">
+<header>
+  <div class="logo">
+    <div class="logo-icon">☁️</div>
+    <div><div class="logo-text">GCP Project Planner</div><div class="logo-sub">project-id: gcp-platform-prod-2026 · Cloud Run hosted</div></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <span class="badge badge-net" style="padding:4px 10px;font-size:11px">Q2 2026</span>
+    <button class="add-btn" onclick="openModal()">+ Add Task</button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="metrics" id="metrics"></div>
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('tasks')">📋 Tasks</button>
+    <button class="tab" onclick="switchTab('timeline')">📅 Timeline</button>
+    <button class="tab" onclick="switchTab('resources')">👥 Resources</button>
+    <button class="tab" onclick="switchTab('stakeholders')">🏛 Stakeholders</button>
+    <button class="tab" onclick="switchTab('terraform')">&#60;/&#62; Terraform</button>
+    <button class="tab" onclick="switchTab('github')">⬡ GitHub</button>
+  </div>
+
+  <div id="panel-tasks" class="panel on">
+    <div class="filters" id="filters"></div>
+    <div class="col-hd"><span></span><span>Task</span><span>Category</span><span>Assignee</span><span>Priority</span><span>Status</span><span>Dates</span><span>Sprint</span></div>
+    <div id="task-list"></div>
+  </div>
+
+  <div id="panel-timeline" class="panel">
+    <div class="sprint-cards" id="sprint-cards"></div>
+    <div class="gantt-wrap"><div class="gantt-box" id="gantt-box"></div></div>
+  </div>
+
+  <div id="panel-resources" class="panel">
+    <div class="res-grid" id="res-grid"></div>
+  </div>
+
+  <div id="panel-stakeholders" class="panel">
+    <table class="sh-table" id="sh-table">
+      <thead><tr><th>Stakeholder</th><th>Role</th><th>Interest</th><th>Notification</th><th>TF impact</th></tr></thead>
+      <tbody id="sh-body"></tbody>
+    </table>
+  </div>
+
+  <div id="panel-terraform" class="panel" id="tf-panel"></div>
+  <div id="panel-github" class="panel" id="gh-panel"></div>
+</div>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal-bg" style="display:none">
+  <div class="modal">
+    <div class="modal-head">
+      <span style="font-weight:700;font-size:14px">Add Task</span>
+      <button onclick="closeModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#9ca3af;line-height:1">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="mode-tabs">
+        <button class="mode-tab on" onclick="setMode('manual')">✏️ Manual</button>
+        <button class="mode-tab" onclick="setMode('ai')">✨ AI suggest <span class="ai-tag">Claude</span></button>
+      </div>
+      <div id="manual-form">
+        <div class="field"><label>Task name</label><input id="f-name" placeholder="e.g. Enable Binary Authorization on GKE"></div>
+        <div class="grid2">
+          <div class="field"><label>Category</label><select id="f-cat"><option value="infra">Infrastructure</option><option value="iam">IAM</option><option value="net">Networking</option><option value="sec">Security</option><option value="ci">CI/CD</option><option value="mon">Monitoring</option></select></div>
+          <div class="field"><label>Priority</label><select id="f-prio"><option value="high">High</option><option value="med" selected>Medium</option><option value="low">Low</option></select></div>
+          <div class="field"><label>Sprint</label><select id="f-sprint"><option value="S1">Sprint 1</option><option value="S2" selected>Sprint 2</option><option value="S3">Sprint 3</option><option value="S4">Sprint 4</option></select></div>
+          <div class="field"><label>Status</label><select id="f-status"><option value="todo" selected>To do</option><option value="prog">In progress</option><option value="done">Done</option><option value="block">Blocked</option></select></div>
+          <div class="field"><label>Start date</label><input type="date" id="f-start"></div>
+          <div class="field"><label>End date</label><input type="date" id="f-end"></div>
+        </div>
+        <div class="field"><label>Assignee</label><select id="f-assignee"><option>Alex Chen</option><option>Priya Sharma</option><option>Marcus Webb</option><option>Sara Okonkwo</option><option>Lena Park</option><option>Jin Torres</option></select></div>
+        <button class="submit-btn" style="background:#2563eb;color:#fff" onclick="submitManual()">Add Task</button>
+      </div>
+      <div id="ai-form" style="display:none">
+        <div class="field"><label>Describe what you need</label><textarea id="ai-prompt" rows="3" placeholder="e.g. Set up disaster recovery and automated DB backups for the GCP environment"></textarea></div>
+        <button class="submit-btn" style="background:#7c3aed;color:#fff" onclick="callAI()">✨ Generate with AI</button>
+        <div id="ai-result" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TASKS=[
+  {id:1,name:"Create GCP project & billing account",cat:"infra",assignee:"Alex Chen",prio:"high",status:"done",sprint:"S1",start:"2026-04-01",end:"2026-04-04"},
+  {id:2,name:"Design VPC network topology",cat:"net",assignee:"Priya Sharma",prio:"high",status:"done",sprint:"S1",start:"2026-04-01",end:"2026-04-07"},
+  {id:3,name:"Set up Terraform state backend (GCS)",cat:"infra",assignee:"Alex Chen",prio:"high",status:"done",sprint:"S1",start:"2026-04-03",end:"2026-04-06"},
+  {id:4,name:"Configure Artifact Registry",cat:"ci",assignee:"Alex Chen",prio:"med",status:"done",sprint:"S1",start:"2026-04-05",end:"2026-04-08"},
+  {id:5,name:"Configure Shared VPC & subnets",cat:"net",assignee:"Priya Sharma",prio:"high",status:"prog",sprint:"S2",start:"2026-04-14",end:"2026-04-21"},
+  {id:6,name:"Set up Cloud NAT & firewall rules",cat:"net",assignee:"Priya Sharma",prio:"med",status:"prog",sprint:"S2",start:"2026-04-16",end:"2026-04-24"},
+  {id:7,name:"Provision GKE cluster (Autopilot)",cat:"infra",assignee:"Alex Chen",prio:"high",status:"prog",sprint:"S2",start:"2026-04-14",end:"2026-04-28"},
+  {id:8,name:"Deploy CI/CD pipeline (Cloud Build)",cat:"ci",assignee:"Alex Chen",prio:"high",status:"prog",sprint:"S2",start:"2026-04-17",end:"2026-04-30"},
+  {id:9,name:"Create Terraform modules (VPC, GKE)",cat:"infra",assignee:"Alex Chen",prio:"high",status:"prog",sprint:"S2",start:"2026-04-14",end:"2026-04-30"},
+  {id:10,name:"Configure Workload Identity Federation",cat:"iam",assignee:"Marcus Webb",prio:"high",status:"todo",sprint:"S2",start:"2026-04-21",end:"2026-04-30"},
+  {id:11,name:"Define IAM roles & org policies",cat:"iam",assignee:"Marcus Webb",prio:"high",status:"todo",sprint:"S2",start:"2026-04-21",end:"2026-04-30"},
+  {id:12,name:"Set up Cloud SQL (PostgreSQL HA)",cat:"infra",assignee:"Lena Park",prio:"high",status:"todo",sprint:"S2",start:"2026-04-24",end:"2026-05-05"},
+  {id:13,name:"Configure VPC Service Controls",cat:"sec",assignee:"Sara Okonkwo",prio:"high",status:"block",sprint:"S2",start:"2026-04-21",end:"2026-05-02"},
+  {id:14,name:"Set up Secret Manager & CMEK",cat:"sec",assignee:"Sara Okonkwo",prio:"high",status:"todo",sprint:"S2",start:"2026-04-24",end:"2026-05-07"},
+  {id:15,name:"Enable Cloud Armor WAF policies",cat:"sec",assignee:"Sara Okonkwo",prio:"med",status:"todo",sprint:"S3",start:"2026-05-05",end:"2026-05-16"},
+  {id:16,name:"Configure Cloud Logging sinks",cat:"mon",assignee:"Jin Torres",prio:"med",status:"todo",sprint:"S3",start:"2026-05-05",end:"2026-05-14"},
+  {id:17,name:"Set up Cloud Monitoring dashboards",cat:"mon",assignee:"Jin Torres",prio:"med",status:"todo",sprint:"S3",start:"2026-05-07",end:"2026-05-19"},
+  {id:18,name:"Deploy Cloud Load Balancer + SSL",cat:"net",assignee:"Priya Sharma",prio:"med",status:"todo",sprint:"S3",start:"2026-05-05",end:"2026-05-15"},
+  {id:19,name:"Configure alerting & PagerDuty",cat:"mon",assignee:"Jin Torres",prio:"med",status:"todo",sprint:"S3",start:"2026-05-14",end:"2026-05-23"},
+  {id:20,name:"Run security compliance audit",cat:"sec",assignee:"Sara Okonkwo",prio:"high",status:"todo",sprint:"S4",start:"2026-05-26",end:"2026-06-06"},
+];
+let tasks=[...TASKS];
+
+const SPRINTS=[
+  {id:"S1",label:"Sprint 1",start:"2026-04-01",end:"2026-04-11",goal:"Foundation: project setup, VPC design, state backend"},
+  {id:"S2",label:"Sprint 2",start:"2026-04-14",end:"2026-05-02",goal:"Core infra: GKE, SQL, IAM, networking, CI/CD"},
+  {id:"S3",label:"Sprint 3",start:"2026-05-05",end:"2026-05-23",goal:"Security & observability: WAF, logging, alerting"},
+  {id:"S4",label:"Sprint 4",start:"2026-05-26",end:"2026-06-06",goal:"Hardening: compliance audit, DR test, handoff docs"},
+];
+
+const RESOURCES=[
+  {name:"Alex Chen",role:"DevOps Lead",alloc:90,color:"#1d4ed8"},
+  {name:"Priya Sharma",role:"Network Engineer",alloc:70,color:"#065f46"},
+  {name:"Marcus Webb",role:"IAM Engineer",alloc:60,color:"#5b21b6"},
+  {name:"Sara Okonkwo",role:"Security Engineer",alloc:80,color:"#9a3412"},
+  {name:"Lena Park",role:"DB Administrator",alloc:50,color:"#92400e"},
+  {name:"Jin Torres",role:"SRE",alloc:65,color:"#14532d"},
+];
+
+const STAKEHOLDERS=[
+  {name:"CTO Office",role:"Executive sponsor",interest:"Budget & timeline",notify:"Weekly summary",tf:"Project billing"},
+  {name:"Platform Team",role:"Owner / builder",interest:"Architecture decisions",notify:"Daily standup",tf:"VPC, GKE, IAM"},
+  {name:"App Dev Teams",role:"Consumer",interest:"GKE cluster, SQL access",notify:"Sprint demos",tf:"Namespaces, SAs"},
+  {name:"Security & Compliance",role:"Approver",interest:"IAM, VPC SC, audit logs",notify:"Policy changes",tf:"VPC SC, CMEK"},
+  {name:"Finance",role:"Observer",interest:"Cost allocation",notify:"Monthly report",tf:"Billing exports"},
+  {name:"Ops / SRE",role:"Operator",interest:"Monitoring, runbooks",notify:"On incident",tf:"Cloud Monitoring"},
+  {name:"Legal / Privacy",role:"Approver",interest:"Data residency",notify:"Data scope changes",tf:"Region, DLP"},
+];
+
+const CAT_LABELS={infra:"Infrastructure",iam:"IAM",net:"Networking",sec:"Security",ci:"CI/CD",mon:"Monitoring"};
+
+function fmtDate(d){if(!d)return"—";const dt=new Date(d+"T00:00:00");return dt.toLocaleDateString("en-US",{month:"short",day:"numeric"});}
+function badge(cat){return`<span class="badge badge-${cat}">${CAT_LABELS[cat]||cat}</span>`;}
+function prioB(p){return`<span class="badge prio-${p}">${p}</span>`;}
+function stB(s){const l={done:"Done",prog:"In progress",todo:"To do",block:"Blocked"};return`<span class="badge st-${s}">${l[s]||s}</span>`;}
+function avt(name,color,size=22){const ini=name.split(" ").map(x=>x[0]).join("").slice(0,2);return`<div class="avatar" style="width:${size}px;height:${size}px;background:${color}22;color:${color};font-size:${size*.36}px">${ini}</div>`;}
+
+let activeFilter="all";
+let activeTab="tasks";
+
+function renderMetrics(){
+  const done=tasks.filter(t=>t.status==="done").length;
+  const prog=tasks.filter(t=>t.status==="prog").length;
+  const block=tasks.filter(t=>t.status==="block").length;
+  const pct=Math.round(done/tasks.length*100);
+  document.getElementById("metrics").innerHTML=[
+    ["Total",tasks.length,"#1d4ed8",""],
+    ["Done",done,"#059669",""],
+    ["In Progress",prog,"#d97706",""],
+    ["Blocked",block,"#dc2626",""],
+    ["Complete",pct+"%","#7c3aed",pct],
+  ].map(([l,v,c,p])=>`<div class="metric"><div class="metric-label">${l}</div><div class="metric-val" style="color:${c}">${v}</div>${p!==''?`<div class="pbar"><div class="pbar-fill" style="width:${p}%;background:${c}"></div></div>`:""}
+</div>`).join("");
+}
+
+function renderFilters(){
+  const items=[["all","All"],["todo","To do"],["prog","In progress"],["done","Done"],["block","Blocked"]];
+  document.getElementById("filters").innerHTML=items.map(([k,l])=>`<button class="filt ${k===activeFilter?"on":""}" onclick="applyFilter('${k}')">${l} ${k!=="all"?`<b style="background:#e5e7eb;border-radius:10px;padding:1px 5px;font-size:9px;color:#6b7280;margin-left:2px">${tasks.filter(t=>t.status===k).length}</b>`:""}</button>`).join("");
+}
+
+function renderTasks(){
+  const show=activeFilter==="all"?tasks:tasks.filter(t=>t.status===activeFilter);
+  const now=new Date();now.setHours(0,0,0,0);
+  document.getElementById("task-list").innerHTML=show.map(t=>{
+    const res=RESOURCES.find(r=>r.name===t.assignee);
+    const endD=new Date(t.end+"T00:00:00");
+    const late=endD<now&&t.status!=="done";
+    return`<div class="task-row">
+      <input type="checkbox" ${t.status==="done"?"checked":""} onchange="toggleTask(${t.id},this.checked)" style="cursor:pointer">
+      <span style="font-weight:500;${t.status==="done"?"text-decoration:line-through;color:#9ca3af":""}">${t.name}</span>
+      ${badge(t.cat)}
+      <div style="display:flex;align-items:center;gap:5px">${res?avt(res.name,res.color):""}<span style="font-size:11px;color:#6b7280">${t.assignee.split(" ")[0]}</span></div>
+      ${prioB(t.prio)}
+      ${stB(t.status)}
+      <div class="date-cell"><div style="font-size:11px;color:#374151">${fmtDate(t.start)}</div><div style="font-size:10px;color:${late?"#dc2626":"#9ca3af"}">→ ${fmtDate(t.end)}${late?" ⚠":""}
+</div></div>
+      <span style="font-size:11px;color:#9ca3af;font-weight:500">${t.sprint}</span>
+    </div>`;
+  }).join("") || `<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:13px;background:#fff;border:1px solid #f3f4f6;border-top:none;border-radius:0 0 8px 8px">No tasks match this filter</div>`;
+}
+
+function applyFilter(f){activeFilter=f;renderFilters();renderTasks();}
+function toggleTask(id,checked){const t=tasks.find(x=>x.id===id);if(t){t.status=checked?"done":"todo";}renderTasks();renderMetrics();}
+
+const GANTT_S=new Date("2026-04-01");const GANTT_E=new Date("2026-06-13");
+function pct(ds){const d=new Date(ds+"T00:00:00");return Math.max(0,Math.min(100,((d-GANTT_S)/(GANTT_E-GANTT_S))*100));}
+
+function renderTimeline(){
+  // Sprint cards
+  document.getElementById("sprint-cards").innerHTML=SPRINTS.map(s=>{
+    const st=tasks.filter(t=>t.sprint===s.id);
+    const sd=st.filter(t=>t.status==="done").length;
+    const sp=st.length?Math.round(sd/st.length*100):0;
+    return`<div class="sprint-card"><div class="sprint-id">${s.label}</div><div class="sprint-dates">${fmtDate(s.start)} — ${fmtDate(s.end)}</div><div class="sprint-goal">${s.goal}</div><div class="sprint-prog"><div class="sprint-prog-fill" style="width:${sp}%"></div></div><div class="sprint-stat">${sd}/${st.length} done</div></div>`;
+  }).join("");
+
+  // Sprint bands header
+  let bandHtml=`<div style="position:relative;height:24px;margin-bottom:4px;margin-left:180px">`;
+  SPRINTS.forEach(s=>{
+    const left=pct(s.start),right=100-pct(s.end);
+    const colors={S1:"#eff6ff",S2:"#f5f3ff",S3:"#ecfdf5",S4:"#fff7ed"};
+    bandHtml+=`<div style="position:absolute;left:${left}%;right:${right}%;top:0;bottom:0;background:${colors[s.id]};border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#6b7280;border:1px solid #e5e7eb">${s.label}</div>`;
+  });
+  bandHtml+="</div>";
+
+  // Week ticks
+  let weeks="";let d=new Date(GANTT_S);
+  while(d<GANTT_E){const p=((d-GANTT_S)/(GANTT_E-GANTT_S))*100;weeks+=`<div style="position:absolute;left:${p}%;font-size:9px;color:#d1d5db;white-space:nowrap">${d.toLocaleDateString("en-US",{month:"short",day:"numeric"})}</div>`;d=new Date(d.getTime()+7*86400000);}
+
+  let rows=tasks.map(t=>{
+    const l=pct(t.start),r=100-pct(t.end);
+    const sc={done:"#059669",prog:"#2563eb",todo:"#9ca3af",block:"#dc2626"}[t.status]||"#9ca3af";
+    return`<div style="display:flex;align-items:stretch;margin-bottom:3px;height:24px">
+      <div style="width:180px;flex-shrink:0;font-size:11px;color:#374151;padding-right:10px;display:flex;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="${t.name}">${t.name}</div>
+      <div style="flex:1;position:relative;background:#f9fafb;border-radius:3px;border:1px solid #f3f4f6">
+        <div style="position:absolute;left:${l}%;right:${r}%;top:3px;bottom:3px;background:${sc}22;border:1.5px solid ${sc};border-radius:3px;min-width:5px" title="${t.name}: ${fmtDate(t.start)} → ${fmtDate(t.end)}"></div>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("gantt-box").innerHTML=`
+    ${bandHtml}
+    <div style="position:relative;height:18px;margin-bottom:8px;margin-left:180px">${weeks}</div>
+    ${rows}
+    <div class="gantt-legend">
+      ${[["#059669","Done"],["#2563eb","In progress"],["#9ca3af","To do"],["#dc2626","Blocked"]].map(([c,l])=>`<div class="gantt-legend-item"><div class="gantt-legend-dot" style="background:${c}33;border:1.5px solid ${c}"></div>${l}</div>`).join("")}
+    </div>`;
+}
+
+function renderResources(){
+  document.getElementById("res-grid").innerHTML=RESOURCES.map(r=>{
+    const rt=tasks.filter(t=>t.assignee===r.name);
+    const rd=rt.filter(t=>t.status==="done").length;
+    const rp=rt.filter(t=>t.status==="prog").length;
+    const rk=rt.length?Math.round(rd/rt.length*100):0;
+    return`<div class="res-card">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">${avt(r.name,r.color,40)}<div><div style="font-weight:600;font-size:13px">${r.name}</div><div style="font-size:11px;color:#9ca3af">${r.role}</div></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:3px"><span>Allocation</span><span style="font-weight:600;color:#111">${r.alloc}%</span></div>
+      <div style="height:5px;background:#f3f4f6;border-radius:3px;margin-bottom:10px"><div style="height:100%;background:${r.color};border-radius:3px;width:${r.alloc}%;opacity:.8"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#6b7280;margin-bottom:4px">
+        <span>Tasks: <b style="color:#111">${rt.length}</b></span><span>Done: <b style="color:#059669">${rd}</b></span><span>Active: <b style="color:#d97706">${rp}</b></span>
+      </div>
+      <div style="height:4px;background:#f3f4f6;border-radius:2px"><div style="height:100%;background:#059669;border-radius:2px;width:${rk}%"></div></div>
+      <div style="font-size:10px;color:#9ca3af;margin-top:4px">${rk}% complete</div>
+    </div>`;
+  }).join("");
+}
+
+function renderStakeholders(){
+  document.getElementById("sh-body").innerHTML=STAKEHOLDERS.map(s=>`
+    <tr><td style="font-weight:600">${s.name}</td><td style="color:#6b7280">${s.role}</td><td>${s.interest}</td>
+    <td><span class="badge badge-ci" style="font-size:10px">${s.notify}</span></td>
+    <td style="font-family:monospace;font-size:10px;color:#6b7280">${s.tf}</td></tr>`).join("");
+}
+
+function renderTerraform(){
+  const blocks=[
+    {title:"providers.tf + backend.tf",file:"Remote GCS state, provider pinning",code:`terraform {
+  required_version = ">= 1.7"
+  required_providers {
+    google = { source = "hashicorp/google", version = "~> 5.0" }
+  }
+  backend "gcs" {
+    bucket = "my-org-tf-state"
+    prefix = "gcp-platform/state"
+  }
+}
+provider "google" {
+  project = var.project_id
+  region  = var.region
+}`},
+    {title:"modules/gke/main.tf",file:"GKE Autopilot, Workload Identity, private nodes",code:`resource "google_container_cluster" "main" {
+  name             = "platform-gke-\${var.env}"
+  location         = var.region
+  enable_autopilot = true
+  private_cluster_config {
+    enable_private_nodes   = true
+    master_ipv4_cidr_block = "172.16.0.0/28"
+  }
+  workload_identity_config {
+    workload_pool = "\${var.project_id}.svc.id.goog"
+  }
+}`},
+    {title:"modules/cloudsql/main.tf",file:"PostgreSQL 15 HA, private IP, CMEK",code:`resource "google_sql_database_instance" "main" {
+  name             = "platform-pg-\${var.env}"
+  database_version = "POSTGRES_15"
+  deletion_protection = true
+  settings {
+    tier              = "db-custom-4-16384"
+    availability_type = "REGIONAL"
+    backup_configuration { enabled = true }
+    ip_configuration {
+      ipv4_enabled    = false
+      private_network = module.networking.vpc_id
+    }
+  }
+  encryption_key_name = var.cmek_key_id
+}`},
+  ];
+  document.getElementById("panel-terraform").innerHTML=blocks.map(b=>`
+    <div class="tf-block"><div class="tf-head"><span class="tf-title">${b.title}</span><span class="tf-file">${b.file}</span></div>
+    <pre>${b.code}</pre></div>`).join("")+`<button style="margin-top:6px;padding:8px 16px;background:#1d4ed8;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer" onclick="sendPrompt('Generate the complete production-ready Terraform code for the GCP infrastructure project including Cloud Run hosting, VPC, GKE, Cloud SQL, IAM, monitoring, and security modules')">Generate full Terraform code ↗</button>`;
+}
+
+function renderGitHub(){
+  const cards=[
+    {i:"🌿",t:"Branching strategy",items:["main → protected, 2 approvals required","feat/TASK-ID per task card","env/staging and env/prod promotion","Trunk-based, short-lived branches"]},
+    {i:"🛡",t:"CODEOWNERS & protection",items:["modules/iam/ → @security-team","modules/networking/ → @netops-team","terraform validate + tflint on every PR","Checkov HIGH severity = PR blocked"]},
+    {i:"⚙️",t:"CI — GitHub Actions",items:["terraform fmt -check on changed modules","terraform plan posted as PR comment","Checkov IaC security scan","OPA/Conftest policy compliance checks"]},
+    {i:"🚀",t:"CD — Deployment",items:["Staging: auto-deploy on merge to main","Prod: manual approval gate required","Slack notification per environment","Daily scheduled drift detection"]},
+    {i:"📋",t:"Issues & project board",items:["Labels: infra/iam/net/sec/ci/mon","Milestones = sprints S1–S4","Auto-close on linked PR merge","Weekly digest via GitHub Discussions"]},
+    {i:"🔔",t:"Stakeholder notifications",items:["CTO: weekly Actions summary","Security: notify on IAM/VPC-SC merge","Finance: monthly cost label audit","App teams: notify on GKE changes"]},
+  ];
+  document.getElementById("panel-github").innerHTML=`<div class="gh-grid">${cards.map(c=>`
+    <div class="gh-card"><div class="gh-card-head"><span style="font-size:18px">${c.i}</span><span class="gh-card-title">${c.t}</span></div>
+    <ul class="gh-list">${c.items.map(i=>`<li><span style="color:#d1d5db;flex-shrink:0">›</span>${i}</li>`).join("")}</ul></div>`).join("")}</div>`;
+}
+
+function switchTab(name){
+  document.querySelectorAll(".tab").forEach((t,i)=>t.classList.toggle("on",["tasks","timeline","resources","stakeholders","terraform","github"][i]===name));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("on"));
+  document.getElementById("panel-"+name).classList.add("on");
+  activeTab=name;
+}
+
+// Modal
+let modalMode="manual";
+function openModal(){document.getElementById("modal").style.display="flex";}
+function closeModal(){document.getElementById("modal").style.display="none";document.getElementById("ai-result").innerHTML="";}
+function setMode(m){
+  modalMode=m;
+  document.querySelectorAll(".mode-tab").forEach((t,i)=>t.classList.toggle("on",["manual","ai"][i]===m));
+  document.getElementById("manual-form").style.display=m==="manual"?"block":"none";
+  document.getElementById("ai-form").style.display=m==="ai"?"block":"none";
+}
+function submitManual(){
+  const name=document.getElementById("f-name").value.trim();
+  const start=document.getElementById("f-start").value;
+  const end=document.getElementById("f-end").value;
+  if(!name||!start||!end){alert("Please fill in task name, start date, and end date.");return;}
+  tasks.push({id:Date.now(),name,cat:document.getElementById("f-cat").value,prio:document.getElementById("f-prio").value,status:document.getElementById("f-status").value,sprint:document.getElementById("f-sprint").value,start,end,assignee:document.getElementById("f-assignee").value});
+  renderMetrics();renderFilters();renderTasks();renderTimeline();renderResources();
+  closeModal();
+}
+
+async function callAI(){
+  const prompt=document.getElementById("ai-prompt").value.trim();
+  if(!prompt)return;
+  const res=document.getElementById("ai-result");
+  res.innerHTML=`<div style="text-align:center;padding:16px;color:#9ca3af;font-size:12px">✨ Generating GCP tasks...</div>`;
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:`You are a GCP cloud architect. Given: "${prompt}"
+Generate 3 specific GCP infrastructure tasks as JSON only (no markdown):
+[{"name":"...","cat":"infra|iam|net|sec|ci|mon","prio":"high|med|low","assignee":"Alex Chen|Priya Sharma|Marcus Webb|Sara Okonkwo|Lena Park|Jin Torres","sprint":"S1|S2|S3|S4","start":"2026-05-01","end":"2026-05-15","status":"todo"}]`}]})});
+    const data=await r.json();
+    const text=data.content?.find(c=>c.type==="text")?.text||"[]";
+    const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
+    res.innerHTML=`<div style="font-size:11px;color:#6b7280;font-weight:500;margin-bottom:8px">AI suggested ${parsed.length} tasks:</div>`+
+      parsed.map((t,i)=>`<div class="ai-card"><div class="ai-card-name">${t.name}</div><div class="ai-card-meta">${badge(t.cat)}<span class="badge prio-${t.prio}">${t.prio}</span><span style="font-size:10px;color:#9ca3af">${t.assignee}</span><span style="font-size:10px;color:#9ca3af">${fmtDate(t.start)} → ${fmtDate(t.end)}</span></div></div>`).join("")+
+      `<button class="submit-btn" style="background:#7c3aed;color:#fff" onclick='addAITasks(${JSON.stringify(parsed).replace(/'/g,"&apos;")})'>Add ${parsed.length} tasks ✓</button>`;
+  }catch(e){
+    res.innerHTML=`<div style="color:#dc2626;font-size:12px;padding:8px">Could not generate tasks. Please try again.</div>`;
+  }
+}
+
+function addAITasks(suggested){
+  suggested.forEach((t,i)=>tasks.push({...t,id:Date.now()+i}));
+  renderMetrics();renderFilters();renderTasks();renderTimeline();renderResources();
+  closeModal();
+}
+
+// Init
+renderMetrics();renderFilters();renderTasks();renderTimeline();renderResources();renderStakeholders();renderTerraform();renderGitHub();
+</script>
