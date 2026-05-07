@@ -1,0 +1,65 @@
+###############################################################
+# Variables — GCP Project Planner Cloud Run deployment
+###############################################################
+
+variable "project_id" {
+  description = "GCP project ID to deploy into"
+  type        = string
+}
+
+variable "region" {
+  description = "GCP region for Cloud Run and Artifact Registry"
+  type        = string
+  default     = "us-central1"
+}
+
+variable "env" {
+  description = "Deployment environment (staging | prod)"
+  type        = string
+  default     = "staging"
+  validation {
+    condition     = contains(["staging", "prod"], var.env)
+    error_message = "env must be 'staging' or 'prod'."
+  }
+}
+
+variable "github_owner" {
+  description = "GitHub organization or username"
+  type        = string
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "gcp-project-planner"
+}
+
+variable "github_branch" {
+  description = "Branch that triggers Cloud Build (e.g. main)"
+  type        = string
+  default     = "main"
+}
+
+variable "min_instances" {
+  description = "Minimum Cloud Run instances (0 = scale to zero)"
+  type        = number
+  default     = 0
+}
+
+variable "max_instances" {
+  description = "Maximum Cloud Run instances"
+  type        = number
+  default     = 10
+}
+
+variable "enable_armor" {
+  description = "Enable Cloud Armor WAF security policy"
+  type        = bool
+  default     = false
+}
+
+variable "custom_domain" {
+  description = "Optional custom domain for the Cloud Run service (e.g. planner.example.com)"
+  type        = string
+  default     = ""
+}

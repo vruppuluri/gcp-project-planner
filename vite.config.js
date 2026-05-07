@@ -1,0 +1,18 @@
+{
+  "name": "gcp-project-planner",
+  "version": "1.0.0",
+  "description": "GCP Cloud Project Planner — deployable to Cloud Run",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "vite": "^5.4.0"
+  }
+}
